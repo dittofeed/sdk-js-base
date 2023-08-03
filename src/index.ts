@@ -1,5 +1,7 @@
 import { BatchQueue, ClearTimeout, SetTimeout } from "./batchQueue";
 
+export * from "./batchQueue";
+
 export enum EventType {
   Identify = "identify",
   Track = "track",
