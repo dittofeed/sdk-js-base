@@ -1,0 +1,27 @@
+{
+  "name": "@dittofeed/sdk-js-base",
+  "version": "0.1.0",
+  "description": "Base SDK underlying other javascript based API's. Not intended for direct use.",
+  "main": "dist/cjs/index.js",
+  "module": "dist/ejs/index.js",
+  "types": "dist/cjs/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dittofeed/sdk-js-base.git"
+  },
+  "author": "max@dittofeed.com",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
+    "prepublishOnly": "yarn build"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.0"
+  },
+  "packageManager": "yarn@3.6.0",
+  "dependencies": {}
+}
