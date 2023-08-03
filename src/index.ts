@@ -162,18 +162,29 @@ export interface BatchAppData {
   context?: AppDataContext;
 }
 
-export interface InitParamsBase {
+export interface InitParamsDataBase {
   writeKey: string;
   host?: string;
 }
 
-export interface InitParams<T> extends InitParamsBase {
+export interface InitParamsEnvBase<T> {
   uuid: () => string;
   setTimeout: SetTimeout<T>;
   clearTimeout: ClearTimeout<T>;
-  issueRequest: (data: BatchAppData, params: InitParamsBase) => Promise<void>;
+  issueRequest: (
+    data: BatchAppData,
+    params: InitParamsDataBase
+  ) => Promise<void>;
 }
 
+export interface InitParamsBase<T>
+  extends InitParamsDataBase,
+    InitParamsEnvBase<T> {}
+
+/**
+ * Dittofeed SDK base class providing shared functionality for all js SDKs while
+ * abstracting away environment specific functionality.
+ */
 export class DittofeedSdkBase<T> {
   private batchQueue: BatchQueue<BatchItem, T>;
   private uuid: () => string;
@@ -185,7 +196,7 @@ export class DittofeedSdkBase<T> {
     uuid,
     setTimeout,
     clearTimeout,
-  }: InitParams<T>) {
+  }: InitParamsBase<T>) {
     this.batchQueue = new BatchQueue<BatchItem, ReturnType<typeof setTimeout>>({
       timeout: 500,
       batchSize: 5,

@@ -7,17 +7,11 @@ export type ClearTimeout<T> = (handle: T) => void;
 // Generic class that takes a task type T
 export class BatchQueue<Q, T> {
   private queue: Q[]; // The queue to hold the tasks
-
   private batchSize: number; // The maximum size of a batch
-
   private timeout: number; // The timeout in milliseconds
-
   private timeoutHandle: T | null; // Handle for the timeout, null when there's no active timeout
-
   private executeBatch: BatchFunction<Q>; // The function to execute a batch of tasks
-
   private setTimeout: SetTimeout<T>; // The function to set a timeout
-
   private clearTimeout: ClearTimeout<T>; // The function to clear a timeout
 
   constructor({
