@@ -175,7 +175,6 @@ export interface InitParams<T> extends InitParamsBase {
 }
 
 export class DittofeedSdk<T> {
-  private static instance: DittofeedSdk<unknown>;
   private batchQueue: BatchQueue<BatchItem, T>;
   private uuid: () => string;
 
@@ -202,52 +201,43 @@ export class DittofeedSdk<T> {
     this.uuid = uuid;
   }
 
-  static async init(
-    initParams: InitParams<unknown>
-  ): Promise<DittofeedSdk<unknown>> {
-    if (!DittofeedSdk.instance) {
-      DittofeedSdk.instance = new DittofeedSdk(initParams);
-    }
-    return DittofeedSdk.instance;
-  }
-
-  public static identify(params: IdentifyData) {
+  public identify(params: IdentifyData) {
     const data: BatchIdentifyData = {
-      messageId: params.messageId ?? this.instance.uuid(),
+      messageId: params.messageId ?? this.uuid(),
       type: EventType.Identify,
       ...params,
     };
-    this.instance.batchQueue.submit(data);
+    this.batchQueue.submit(data);
   }
 
-  public static track(params: TrackData) {
+  public track(params: TrackData) {
     const data: BatchTrackData = {
-      messageId: params.messageId ?? this.instance.uuid(),
+      messageId: params.messageId ?? this.uuid(),
       type: EventType.Track,
       ...params,
     };
-    this.instance.batchQueue.submit(data);
+    this.batchQueue.submit(data);
   }
 
-  public static page(params: PageData) {
+  public page(params: PageData) {
     const data: BatchPageData = {
-      messageId: params.messageId ?? this.instance.uuid(),
+      messageId: params.messageId ?? this.uuid(),
       type: EventType.Page,
       ...params,
     };
-    this.instance.batchQueue.submit(data);
+    this.batchQueue.submit(data);
   }
 
-  public static screen(params: ScreenData) {
+  public screen(params: ScreenData) {
     const data: BatchScreenData = {
-      messageId: params.messageId ?? this.instance.uuid(),
+      messageId: params.messageId ?? this.uuid(),
       type: EventType.Screen,
       ...params,
     };
-    this.instance.batchQueue.submit(data);
+    this.batchQueue.submit(data);
   }
 
-  public static async flush() {
-    await this.instance.batchQueue.flush();
+  public async flush() {
+    await this.batchQueue.flush();
   }
 }
