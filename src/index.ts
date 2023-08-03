@@ -174,7 +174,7 @@ export interface InitParams<T> extends InitParamsBase {
   issueRequest: (data: BatchAppData, params: InitParamsBase) => Promise<void>;
 }
 
-export class DittofeedSdk<T> {
+export class DittofeedSdkBase<T> {
   private batchQueue: BatchQueue<BatchItem, T>;
   private uuid: () => string;
 
