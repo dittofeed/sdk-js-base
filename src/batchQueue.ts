@@ -13,6 +13,7 @@ export class BatchQueue<Q, T> {
   private executeBatch: BatchFunction<Q>; // The function to execute a batch of tasks
   private setTimeout: SetTimeout<T>; // The function to set a timeout
   private clearTimeout: ClearTimeout<T>; // The function to clear a timeout
+  private pending: Promise<void> | null;
 
   constructor({
     batchSize,
@@ -34,6 +35,7 @@ export class BatchQueue<Q, T> {
     this.executeBatch = executeBatch;
     this.setTimeout = setTimeout;
     this.clearTimeout = clearTimeout;
+    this.pending = null;
   }
 
   // Method to add a task to the queue
@@ -72,11 +74,29 @@ export class BatchQueue<Q, T> {
       return;
     }
 
-    // Create a batch from the queue and remove the processed tasks
-    const batch = this.queue.slice(0, this.batchSize);
-    this.queue = this.queue.slice(this.batchSize);
+    // If there's a pending flush, wait for it to complete
+    if (this.pending) {
+      return this.pending;
+    }
+    try {
+      // Otherwise, start a new flush
+      this.pending = this.flushInner();
+      // Wait for the flush to complete
+      await this.pending;
+    } catch (error) {
+      throw error;
+    } finally {
+      // Reset the pending flag
+      this.pending = null;
+    }
+  }
 
-    // Execute the batch function with the current batch
-    await this.executeBatch(batch);
+  // The inner function that actually performs the flush
+  private async flushInner(): Promise<void> {
+    while (this.queue.length > 0) {
+      const batch = this.queue.slice(0, this.batchSize);
+      this.queue = this.queue.slice(this.batchSize);
+      await this.executeBatch(batch);
+    }
   }
 }
