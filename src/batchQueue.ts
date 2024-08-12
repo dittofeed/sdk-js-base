@@ -1,8 +1,12 @@
+import pRetry, { Options as PRetryOptions } from "p-retry";
+
 // Generic type for the executeBatch function
 export type BatchFunction<T> = (tasks: T[]) => Promise<void>;
 
 export type SetTimeout<T> = (handler: () => void, timeout: number) => T;
 export type ClearTimeout<T> = (handle: T) => void;
+
+export type RetryOptions = PRetryOptions;
 
 // Generic class that takes a task type T
 export class BatchQueue<Q, T> {
@@ -14,6 +18,7 @@ export class BatchQueue<Q, T> {
   private setTimeout: SetTimeout<T>; // The function to set a timeout
   private clearTimeout: ClearTimeout<T>; // The function to clear a timeout
   private pending: Promise<void> | null;
+  private retryOptions: RetryOptions;
 
   constructor({
     batchSize,
@@ -21,12 +26,14 @@ export class BatchQueue<Q, T> {
     executeBatch,
     setTimeout,
     clearTimeout,
+    retryOptions,
   }: {
     batchSize: number;
     timeout: number;
     executeBatch: BatchFunction<Q>;
     setTimeout: SetTimeout<T>;
     clearTimeout: ClearTimeout<T>;
+    retryOptions?: RetryOptions;
   }) {
     this.queue = [];
     this.batchSize = batchSize;
@@ -36,6 +43,9 @@ export class BatchQueue<Q, T> {
     this.setTimeout = setTimeout;
     this.clearTimeout = clearTimeout;
     this.pending = null;
+    this.retryOptions = retryOptions ?? {
+      retries: 5,
+    };
   }
 
   // Method to add a task to the queue
@@ -96,7 +106,13 @@ export class BatchQueue<Q, T> {
     while (this.queue.length > 0) {
       const batch = this.queue.slice(0, this.batchSize);
       this.queue = this.queue.slice(this.batchSize);
-      await this.executeBatch(batch);
+      await this.executeBatchWithRetry(batch);
     }
+  }
+
+  private async executeBatchWithRetry(batch: Q[]): Promise<void> {
+    await pRetry(async () => {
+      await this.executeBatch(batch);
+    }, this.retryOptions);
   }
 }

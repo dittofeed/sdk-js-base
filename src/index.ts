@@ -1,4 +1,9 @@
-import { BatchQueue, ClearTimeout, SetTimeout } from "./batchQueue";
+import {
+  BatchQueue,
+  ClearTimeout,
+  RetryOptions,
+  SetTimeout,
+} from "./batchQueue";
 
 export * from "./batchQueue";
 
@@ -171,6 +176,7 @@ export interface InitParamsEnvBase<T> {
   uuid: () => string;
   setTimeout: SetTimeout<T>;
   clearTimeout: ClearTimeout<T>;
+  retryOptions?: RetryOptions;
   issueRequest: (
     data: BatchAppData,
     params: InitParamsDataBase
@@ -196,12 +202,14 @@ export class DittofeedSdkBase<T> {
     uuid,
     setTimeout,
     clearTimeout,
+    retryOptions,
   }: InitParamsBase<T>) {
     this.batchQueue = new BatchQueue<BatchItem, ReturnType<typeof setTimeout>>({
       timeout: 500,
       batchSize: 5,
       setTimeout,
       clearTimeout,
+      retryOptions,
       executeBatch: async (batch) => {
         const data: BatchAppData = {
           batch,
