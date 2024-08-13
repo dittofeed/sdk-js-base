@@ -194,7 +194,7 @@ export class DittofeedSdkBase<T> {
   constructor({
     issueRequest,
     writeKey,
-    host = "https://dittofeed.com",
+    host = "https://app.dittofeed.com",
     uuid,
     setTimeout,
     clearTimeout,
