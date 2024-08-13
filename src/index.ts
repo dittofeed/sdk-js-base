@@ -175,6 +175,8 @@ export interface InitParamsEnvBase<T> {
     data: BatchAppData,
     params: InitParamsDataBase
   ) => Promise<void>;
+  baseDelay?: number;
+  retries?: number;
 }
 
 export interface InitParamsBase<T>
@@ -196,12 +198,16 @@ export class DittofeedSdkBase<T> {
     uuid,
     setTimeout,
     clearTimeout,
+    baseDelay,
+    retries,
   }: InitParamsBase<T>) {
     this.batchQueue = new BatchQueue<BatchItem, ReturnType<typeof setTimeout>>({
       timeout: 500,
       batchSize: 5,
       setTimeout,
       clearTimeout,
+      baseDelay,
+      retries,
       executeBatch: async (batch) => {
         const data: BatchAppData = {
           batch,
