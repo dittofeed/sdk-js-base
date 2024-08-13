@@ -1,6 +1,6 @@
 {
   "name": "@dittofeed/sdk-js-base",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Base SDK underlying other javascript based API's. Not intended for direct use.",
   "main": "dist/cjs/index.js",
   "module": "dist/ejs/index.js",
