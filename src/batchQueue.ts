@@ -1,12 +1,8 @@
-import pRetry, { Options as PRetryOptions } from "p-retry";
-
 // Generic type for the executeBatch function
 export type BatchFunction<T> = (tasks: T[]) => Promise<void>;
 
 export type SetTimeout<T> = (handler: () => void, timeout: number) => T;
 export type ClearTimeout<T> = (handle: T) => void;
-
-export type RetryOptions = PRetryOptions;
 
 // Generic class that takes a task type T
 export class BatchQueue<Q, T> {
@@ -18,7 +14,8 @@ export class BatchQueue<Q, T> {
   private setTimeout: SetTimeout<T>; // The function to set a timeout
   private clearTimeout: ClearTimeout<T>; // The function to clear a timeout
   private pending: Promise<void> | null;
-  private retryOptions: RetryOptions;
+  private baseDelay: number;
+  private retries: number;
 
   constructor({
     batchSize,
@@ -26,14 +23,16 @@ export class BatchQueue<Q, T> {
     executeBatch,
     setTimeout,
     clearTimeout,
-    retryOptions,
+    baseDelay,
+    retries,
   }: {
     batchSize: number;
     timeout: number;
     executeBatch: BatchFunction<Q>;
     setTimeout: SetTimeout<T>;
     clearTimeout: ClearTimeout<T>;
-    retryOptions?: RetryOptions;
+    baseDelay?: number;
+    retries?: number;
   }) {
     this.queue = [];
     this.batchSize = batchSize;
@@ -43,9 +42,8 @@ export class BatchQueue<Q, T> {
     this.setTimeout = setTimeout;
     this.clearTimeout = clearTimeout;
     this.pending = null;
-    this.retryOptions = retryOptions ?? {
-      retries: 5,
-    };
+    this.baseDelay = baseDelay ?? 500;
+    this.retries = retries ?? 5;
   }
 
   // Method to add a task to the queue
@@ -111,8 +109,30 @@ export class BatchQueue<Q, T> {
   }
 
   private async executeBatchWithRetry(batch: Q[]): Promise<void> {
-    await pRetry(async () => {
+    await this.retryWithExponentialBackoff(async () => {
       await this.executeBatch(batch);
-    }, this.retryOptions);
+    });
+  }
+
+  private async retryWithExponentialBackoff<T>(
+    operation: () => Promise<T>
+  ): Promise<T> {
+    // Ensure maxRetries is not negative
+    const maxRetries = Math.max(0, this.retries);
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        if (attempt === maxRetries) {
+          throw error; // Rethrow the error on the last attempt
+        }
+
+        const delay = this.baseDelay * Math.pow(2, attempt);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+
+    throw new Error("This line should never be reached");
   }
 }
