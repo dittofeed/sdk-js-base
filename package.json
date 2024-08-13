@@ -1,6 +1,6 @@
 {
   "name": "@dittofeed/sdk-js-base",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Base SDK underlying other javascript based API's. Not intended for direct use.",
   "main": "dist/cjs/index.js",
   "module": "dist/ejs/index.js",
@@ -25,6 +25,5 @@
     "ts-jest": "^29.1.5",
     "typescript": "^5.1.0"
   },
-  "packageManager": "yarn@4.3.1",
-  "dependencies": {}
+  "packageManager": "yarn@4.3.1"
 }
