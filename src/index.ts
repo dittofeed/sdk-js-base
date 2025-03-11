@@ -9,6 +9,21 @@ export enum EventType {
   Screen = "screen",
 }
 
+export enum AppFileType {
+  Base64Encoded = "Base64Encoded",
+  BlobStorage = "BlobStorage",
+}
+export interface Base64EncodedFile {
+  type: AppFileType.Base64Encoded;
+  name: string;
+  mimeType: string;
+  data: string;
+}
+
+export type AppDataFile = Base64EncodedFile;
+
+export type AppDataFiles = AppDataFile[];
+
 export type AppDataContext = Record<string, any>;
 
 export interface BaseAppData {
@@ -31,7 +46,7 @@ export interface KnownIdentifyData extends BaseIdentifyData {
 }
 
 export interface AnonymousIdentifyData extends BaseIdentifyData {
-  userId: string;
+  anonymousId: string;
 }
 
 export type IdentifyData = KnownIdentifyData | AnonymousIdentifyData;
@@ -53,12 +68,14 @@ export interface BaseTrackData extends BaseAppData {
   context?: AppDataContext;
   event: string;
   properties?: Record<string, any>;
+  files?: AppDataFiles;
 }
 
 export interface BaseBatchTrackData extends BaseAppData {
   type: EventType.Track;
   event: string;
   properties?: Record<string, any>;
+  files?: AppDataFiles;
 }
 
 export interface KnownTrackData extends BaseTrackData {
