@@ -31,7 +31,7 @@ export interface KnownIdentifyData extends BaseIdentifyData {
 }
 
 export interface AnonymousIdentifyData extends BaseIdentifyData {
-  userId: string;
+  anonymousId: string;
 }
 
 export type IdentifyData = KnownIdentifyData | AnonymousIdentifyData;
