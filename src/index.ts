@@ -2,12 +2,14 @@ import { BatchQueue, ClearTimeout, SetTimeout } from "./batchQueue";
 
 export * from "./batchQueue";
 
-export enum EventType {
-  Identify = "identify",
-  Track = "track",
-  Page = "page",
-  Screen = "screen",
-}
+export const EventType = {
+  Identify: "identify",
+  Track: "track",
+  Page: "page",
+  Screen: "screen",
+} as const;
+
+export type EventType = (typeof EventType)[keyof typeof EventType];
 
 export enum SubscriptionChange {
   Subscribe = "Subscribe",
@@ -65,7 +67,7 @@ export interface BaseIdentifyData extends BaseAppData {
 }
 
 export interface BaseBatchIdentifyData extends BaseAppData {
-  type: EventType.Identify;
+  type: typeof EventType.Identify;
   traits?: Record<string, any>;
 }
 
@@ -100,7 +102,7 @@ export interface BaseTrackData extends BaseAppData {
 }
 
 export interface BaseBatchTrackData extends BaseAppData {
-  type: EventType.Track;
+  type: typeof EventType.Track;
   event: string;
   properties?: Record<string, any>;
   files?: AppDataFiles;
@@ -135,7 +137,7 @@ export interface BasePageData extends BaseAppData {
 }
 
 export interface BaseBatchPageData extends BaseAppData {
-  type: EventType.Page;
+  type: typeof EventType.Page;
   name?: string;
   properties?: Record<string, any>;
 }
@@ -169,7 +171,7 @@ export interface BaseScreenData extends BaseAppData {
 }
 
 export interface BaseBatchScreenData extends BaseAppData {
-  type: EventType.Screen;
+  type: typeof EventType.Screen;
   name?: string;
   properties?: Record<string, any>;
 }
