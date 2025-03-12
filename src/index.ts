@@ -2,19 +2,58 @@ import { BatchQueue, ClearTimeout, SetTimeout } from "./batchQueue";
 
 export * from "./batchQueue";
 
-export enum EventType {
-  Identify = "identify",
-  Track = "track",
-  Page = "page",
-  Screen = "screen",
-}
+export const EventType = {
+  Identify: "identify",
+  Track: "track",
+  Page: "page",
+  Screen: "screen",
+} as const;
 
-export enum AppFileType {
-  Base64Encoded = "Base64Encoded",
-  BlobStorage = "BlobStorage",
-}
+export type EventType = (typeof EventType)[keyof typeof EventType];
+
+export const SubscriptionChange = {
+  Subscribe: "Subscribe",
+  Unsubscribe: "Unsubscribe",
+} as const;
+
+export type SubscriptionChange =
+  (typeof SubscriptionChange)[keyof typeof SubscriptionChange];
+
+export const InternalEventType = {
+  MessageSent: "DFInternalMessageSent",
+  BadWorkspaceConfiguration: "DFBadWorkspaceConfiguration",
+  MessageFailure: "DFMessageFailure",
+  MessageSkipped: "DFMessageSkipped",
+  SegmentBroadcast: "DFSegmentBroadcast",
+  SubscriptionChange: "DFSubscriptionChange",
+  EmailDropped: "DFEmailDropped",
+  EmailDelivered: "DFEmailDelivered",
+  EmailOpened: "DFEmailOpened",
+  EmailClicked: "DFEmailClicked",
+  EmailBounced: "DFEmailBounced",
+  EmailMarkedSpam: "DFEmailMarkedSpam",
+  SmsDelivered: "DFSmsDelivered",
+  SmsFailed: "DFSmsFailed",
+  JourneyNodeProcessed: "DFJourneyNodeProcessed",
+  ManualSegmentUpdate: "DFManualSegmentUpdate",
+  AttachedFiles: "DFAttachedFiles",
+  UserTrackSignal: "DFUserTrackSignal",
+  GroupUserAssignment: "DFGroupUserAssignment",
+  UserGroupAssignment: "DFUserGroupAssignment",
+} as const;
+
+export type InternalEventType =
+  (typeof InternalEventType)[keyof typeof InternalEventType];
+
+export const AppFileType = {
+  Base64Encoded: "Base64Encoded",
+  BlobStorage: "BlobStorage",
+} as const;
+
+export type AppFileType = (typeof AppFileType)[keyof typeof AppFileType];
+
 export interface Base64EncodedFile {
-  type: AppFileType.Base64Encoded;
+  type: typeof AppFileType.Base64Encoded;
   name: string;
   mimeType: string;
   data: string;
@@ -37,7 +76,7 @@ export interface BaseIdentifyData extends BaseAppData {
 }
 
 export interface BaseBatchIdentifyData extends BaseAppData {
-  type: EventType.Identify;
+  type: typeof EventType.Identify;
   traits?: Record<string, any>;
 }
 
@@ -72,7 +111,7 @@ export interface BaseTrackData extends BaseAppData {
 }
 
 export interface BaseBatchTrackData extends BaseAppData {
-  type: EventType.Track;
+  type: typeof EventType.Track;
   event: string;
   properties?: Record<string, any>;
   files?: AppDataFiles;
@@ -107,7 +146,7 @@ export interface BasePageData extends BaseAppData {
 }
 
 export interface BaseBatchPageData extends BaseAppData {
-  type: EventType.Page;
+  type: typeof EventType.Page;
   name?: string;
   properties?: Record<string, any>;
 }
@@ -141,7 +180,7 @@ export interface BaseScreenData extends BaseAppData {
 }
 
 export interface BaseBatchScreenData extends BaseAppData {
-  type: EventType.Screen;
+  type: typeof EventType.Screen;
   name?: string;
   properties?: Record<string, any>;
 }
@@ -163,6 +202,21 @@ export interface BatchScreenDataWithUserId extends BaseBatchScreenData {
 export interface BatchScreenDataWithAnonymousId extends BaseBatchScreenData {
   anonymousId: string;
 }
+
+export interface BaseSubscribeData {
+  subscriptionGroupId: string;
+}
+
+export type KnownSubscribeData = Omit<KnownTrackData, "event" | "properties"> &
+  BaseSubscribeData;
+
+export type AnonymousSubscribeData = Omit<
+  AnonymousTrackData,
+  "event" | "properties"
+> &
+  BaseSubscribeData;
+
+export type SubscribeData = KnownSubscribeData | AnonymousSubscribeData;
 
 export type BatchScreenData =
   | BatchScreenDataWithUserId
@@ -266,6 +320,34 @@ export class DittofeedSdkBase<T> {
     const data: BatchScreenData = {
       messageId: params.messageId ?? this.uuid(),
       type: EventType.Screen,
+      ...params,
+    };
+    this.batchQueue.submit(data);
+  }
+
+  public subscribe(params: SubscribeData) {
+    const data: BatchTrackData = {
+      messageId: params.messageId ?? this.uuid(),
+      type: EventType.Track,
+      event: InternalEventType.SubscriptionChange,
+      properties: {
+        subscriptionId: params.subscriptionGroupId,
+        change: SubscriptionChange.Subscribe,
+      },
+      ...params,
+    };
+    this.batchQueue.submit(data);
+  }
+
+  public unsubscribe(params: SubscribeData) {
+    const data: BatchTrackData = {
+      messageId: params.messageId ?? this.uuid(),
+      type: EventType.Track,
+      event: InternalEventType.SubscriptionChange,
+      properties: {
+        subscriptionId: params.subscriptionGroupId,
+        change: SubscriptionChange.Unsubscribe,
+      },
       ...params,
     };
     this.batchQueue.submit(data);
