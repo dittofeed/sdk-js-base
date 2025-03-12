@@ -291,64 +291,66 @@ export class DittofeedSdkBase<T> {
 
   public identify(params: IdentifyData) {
     const data: BatchIdentifyData = {
+      ...params,
       messageId: params.messageId ?? this.uuid(),
       type: EventType.Identify,
-      ...params,
     };
     this.batchQueue.submit(data);
   }
 
   public track(params: TrackData) {
     const data: BatchTrackData = {
+      ...params,
       messageId: params.messageId ?? this.uuid(),
       type: EventType.Track,
-      ...params,
     };
     this.batchQueue.submit(data);
   }
 
   public page(params: PageData) {
     const data: BatchPageData = {
+      ...params,
       messageId: params.messageId ?? this.uuid(),
       type: EventType.Page,
-      ...params,
     };
     this.batchQueue.submit(data);
   }
 
   public screen(params: ScreenData) {
     const data: BatchScreenData = {
+      ...params,
       messageId: params.messageId ?? this.uuid(),
       type: EventType.Screen,
-      ...params,
     };
     this.batchQueue.submit(data);
   }
 
   public subscribe(params: SubscribeData) {
+    const { messageId, subscriptionGroupId, ...rest } = params;
     const data: BatchTrackData = {
-      messageId: params.messageId ?? this.uuid(),
+      ...rest,
+      messageId: messageId ?? this.uuid(),
       type: EventType.Track,
       event: InternalEventType.SubscriptionChange,
       properties: {
-        subscriptionId: params.subscriptionGroupId,
+        subscriptionId: subscriptionGroupId,
         change: SubscriptionChange.Subscribe,
       },
-      ...params,
     };
     this.batchQueue.submit(data);
   }
 
   public unsubscribe(params: SubscribeData) {
+    const { messageId, subscriptionGroupId, ...rest } = params;
     const data: BatchTrackData = {
-      messageId: params.messageId ?? this.uuid(),
+      ...rest,
+      messageId: messageId ?? this.uuid(),
       type: EventType.Track,
       event: InternalEventType.SubscriptionChange,
       properties: {
-        subscriptionId: params.subscriptionGroupId,
+        subscriptionId: subscriptionGroupId,
         change: SubscriptionChange.Unsubscribe,
       },
-      ...params,
     };
     this.batchQueue.submit(data);
   }
