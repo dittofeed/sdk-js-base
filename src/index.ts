@@ -203,18 +203,18 @@ export interface BatchScreenDataWithAnonymousId extends BaseBatchScreenData {
   anonymousId: string;
 }
 
-export interface BaseSubscribeData {
+export interface BaseSubscribeData
+  extends Omit<BaseTrackData, "event" | "properties" | "files"> {
   subscriptionGroupId: string;
 }
 
-export type KnownSubscribeData = Omit<KnownTrackData, "event" | "properties"> &
-  BaseSubscribeData;
+export interface KnownSubscribeData extends BaseSubscribeData {
+  userId: string;
+}
 
-export type AnonymousSubscribeData = Omit<
-  AnonymousTrackData,
-  "event" | "properties"
-> &
-  BaseSubscribeData;
+export interface AnonymousSubscribeData extends BaseSubscribeData {
+  anonymousId: string;
+}
 
 export type SubscribeData = KnownSubscribeData | AnonymousSubscribeData;
 
