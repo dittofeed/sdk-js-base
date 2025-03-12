@@ -11,40 +11,49 @@ export const EventType = {
 
 export type EventType = (typeof EventType)[keyof typeof EventType];
 
-export enum SubscriptionChange {
-  Subscribe = "Subscribe",
-  Unsubscribe = "Unsubscribe",
-}
+export const SubscriptionChange = {
+  Subscribe: "Subscribe",
+  Unsubscribe: "Unsubscribe",
+} as const;
 
-export enum InternalEventType {
-  MessageSent = "DFInternalMessageSent",
-  BadWorkspaceConfiguration = "DFBadWorkspaceConfiguration",
-  MessageFailure = "DFMessageFailure",
-  MessageSkipped = "DFMessageSkipped",
-  SegmentBroadcast = "DFSegmentBroadcast",
-  SubscriptionChange = "DFSubscriptionChange",
-  EmailDropped = "DFEmailDropped",
-  EmailDelivered = "DFEmailDelivered",
-  EmailOpened = "DFEmailOpened",
-  EmailClicked = "DFEmailClicked",
-  EmailBounced = "DFEmailBounced",
-  EmailMarkedSpam = "DFEmailMarkedSpam",
-  SmsDelivered = "DFSmsDelivered",
-  SmsFailed = "DFSmsFailed",
-  JourneyNodeProcessed = "DFJourneyNodeProcessed",
-  ManualSegmentUpdate = "DFManualSegmentUpdate",
-  AttachedFiles = "DFAttachedFiles",
-  UserTrackSignal = "DFUserTrackSignal",
-  GroupUserAssignment = "DFGroupUserAssignment",
-  UserGroupAssignment = "DFUserGroupAssignment",
-}
+export type SubscriptionChange =
+  (typeof SubscriptionChange)[keyof typeof SubscriptionChange];
 
-export enum AppFileType {
-  Base64Encoded = "Base64Encoded",
-  BlobStorage = "BlobStorage",
-}
+export const InternalEventType = {
+  MessageSent: "DFInternalMessageSent",
+  BadWorkspaceConfiguration: "DFBadWorkspaceConfiguration",
+  MessageFailure: "DFMessageFailure",
+  MessageSkipped: "DFMessageSkipped",
+  SegmentBroadcast: "DFSegmentBroadcast",
+  SubscriptionChange: "DFSubscriptionChange",
+  EmailDropped: "DFEmailDropped",
+  EmailDelivered: "DFEmailDelivered",
+  EmailOpened: "DFEmailOpened",
+  EmailClicked: "DFEmailClicked",
+  EmailBounced: "DFEmailBounced",
+  EmailMarkedSpam: "DFEmailMarkedSpam",
+  SmsDelivered: "DFSmsDelivered",
+  SmsFailed: "DFSmsFailed",
+  JourneyNodeProcessed: "DFJourneyNodeProcessed",
+  ManualSegmentUpdate: "DFManualSegmentUpdate",
+  AttachedFiles: "DFAttachedFiles",
+  UserTrackSignal: "DFUserTrackSignal",
+  GroupUserAssignment: "DFGroupUserAssignment",
+  UserGroupAssignment: "DFUserGroupAssignment",
+} as const;
+
+export type InternalEventType =
+  (typeof InternalEventType)[keyof typeof InternalEventType];
+
+export const AppFileType = {
+  Base64Encoded: "Base64Encoded",
+  BlobStorage: "BlobStorage",
+} as const;
+
+export type AppFileType = (typeof AppFileType)[keyof typeof AppFileType];
+
 export interface Base64EncodedFile {
-  type: AppFileType.Base64Encoded;
+  type: typeof AppFileType.Base64Encoded;
   name: string;
   mimeType: string;
   data: string;
