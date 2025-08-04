@@ -334,7 +334,7 @@ export class DittofeedSdkBase<T> {
       event: InternalEventType.SubscriptionChange,
       properties: {
         subscriptionId: subscriptionGroupId,
-        change: SubscriptionChange.Subscribe,
+        action: SubscriptionChange.Subscribe,
       },
     };
     this.batchQueue.submit(data);
@@ -349,7 +349,7 @@ export class DittofeedSdkBase<T> {
       event: InternalEventType.SubscriptionChange,
       properties: {
         subscriptionId: subscriptionGroupId,
-        change: SubscriptionChange.Unsubscribe,
+        action: SubscriptionChange.Unsubscribe,
       },
     };
     this.batchQueue.submit(data);
